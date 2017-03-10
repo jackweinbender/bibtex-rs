@@ -67,7 +67,7 @@ impl<'a> BibEntry<'a> {
             entry.push_str("}");
         }
 
-        entry.push_str("}");
+        entry.push_str("\n}");
         entry
         
     }
@@ -81,29 +81,24 @@ mod test{
 
     #[test]
     fn getters() {
-
-        let mut h = Vec::new();
-        h.push(Field("title", "Remembering Rewritten Bible"));
-        h.push(Field("author", "Jack Weinbender"));
-        h.push(Field("year", "2018"));
+        let bib = include_str!("../test/single.bib");
+        let mut v = Vec::new();
+        v.push(Field("title", "The Historiographical {Jesus}: Memory, Typology, and the Son of {David}"));
+        v.push(Field("shorttitle", "The Historiographical Jesus"));
+        v.push(Field("author", "Le Donne, Anthony"));
+        v.push(Field("location", "Waco, TX"));
+        v.push(Field("publisher", "Baylor University Press"));
+        v.push(Field("year", "2009"));
 
         let mut e = BibEntry {
-            entry_type: "thesis",
-            cite_key: "weinbender2018",
-            fields: h,
+            entry_type: "book",
+            cite_key: "le-donne2009",
+            fields: v,
         };
 
-        assert_eq!(e.cite_key(), "weinbender2018");
-        assert_eq!(e.entry_type(), "thesis");
-        assert_eq!(e.field("author"), "Jack Weinbender");
-        assert_eq!(e.field("title"), "Remembering Rewritten Bible");
-        assert_eq!(e.field("year"), "2018");
-        assert_eq!(
-            e.to_string(), 
-r#"@thesis{weinbender2018,
-  author = {Jack Weinbender},
-  title = {Remembering Rewritten Bible},
-  year = {2018}}"#.to_string()
-        );
+        assert_eq!(e.cite_key(), "le-donne2009");
+        assert_eq!(e.entry_type(), "book");
+        assert_eq!(e.field("author"), "Le Donne, Anthony");
+        assert_eq!(e.to_string(), bib);
     }
 }
