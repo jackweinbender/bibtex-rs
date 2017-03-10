@@ -81,7 +81,7 @@ mod test{
 
     #[test]
     fn getters() {
-        let bib = include_str!("../test/single.bib");
+        let bib = include_str!("../test/single_sorted.bib");
         let mut v = Vec::new();
         v.push(Field("title", "The Historiographical {Jesus}: Memory, Typology, and the Son of {David}"));
         v.push(Field("shorttitle", "The Historiographical Jesus"));
