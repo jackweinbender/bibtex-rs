@@ -2,7 +2,7 @@ use entry::Entry;
 use field::Field;
 
 #[test]
-fn getters() {
+fn serialization() {
     let bib = include_str!("../test/single_sorted.bib");
     let mut v = Vec::new();
     v.push(Field::new("title", "The Historiographical {Jesus}: Memory, Typology, and the Son of {David}"));
