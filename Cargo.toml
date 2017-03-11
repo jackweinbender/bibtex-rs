@@ -1,6 +1,13 @@
 [package]
 name = "bibtex"
+description = "A BibTex Parser/Serializer written in pure Rust."
 version = "0.1.0"
-authors = ["Jack Weinbender <jack.weinbender@gmail.com>"]
 
-[dependencies]
+authors = ["Jack Weinbender <jack.weinbender@gmail.com>"]
+repository = "http://www.github.com/jackweinbender/bibtex-rs"
+
+keywords = ["bibtex", "latex", "biblatex"]
+categories = ["text-processing", "parser-implementations", "parsing"]
+
+readme = "README.md"
+license = "MIT"
