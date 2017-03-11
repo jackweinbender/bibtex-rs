@@ -6,4 +6,3 @@ authors = ["Jack Weinbender <jack.weinbender@gmail.com>"]
 #![allow(dead_code)]
 
 [dependencies]
-log = "*"
