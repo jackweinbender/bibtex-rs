@@ -1,7 +1,7 @@
 [package]
 name = "bibtex"
 description = "A BibTex Parser/Serializer written in pure Rust."
-version = "0.1.0"
+version = "0.0.1"
 
 authors = ["Jack Weinbender <jack.weinbender@gmail.com>"]
 repository = "http://www.github.com/jackweinbender/bibtex-rs"
