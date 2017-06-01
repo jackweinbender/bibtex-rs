@@ -14,13 +14,13 @@ impl<'a> Entry<'a> {
             fields: fields
         }
     }
-    fn cite_key(&self) -> &str {
+    pub fn cite_key(&self) -> &str {
         &self.cite_key
     }
-    fn entry_type(&self) -> &str {
+    pub fn entry_type(&self) -> &str {
         &self.entry_type
     }
-    fn field(&self, field: &str) -> &str {
+    pub fn field(&self, field: &str) -> &str {
         let fields = &self.fields;
         let index = fields.iter().position(|x| 
             x.key() == field ).expect("No key found.");
