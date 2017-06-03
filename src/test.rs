@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 use entry::Entry;
 use field::Field;
 // use parser::Parser;
@@ -20,5 +21,10 @@ fn serialization() {
     let mut entry = Entry::new("book", "le-donne2009", fields);
     
     assert_eq!(entry.to_string(), bib);
+=======
+#[test]
+fn parse() {    
+    assert_eq!(true, true);
+>>>>>>> 550a13840f81e6e40319fedc1e2c3858a663c513
 }
 
