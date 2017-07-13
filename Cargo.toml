@@ -7,4 +7,9 @@ authors = ["Jack Weinbender <jack.weinbender@gmail.com>"]
 name = "bibtex"
 path = "src/lib.rs"
 
+[[bin]]
+name = "scratch"
+path = "src/_scratch.rs"
+
 [dependencies]
+nom = "^3.1"
