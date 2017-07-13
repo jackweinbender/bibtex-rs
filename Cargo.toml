@@ -3,4 +3,12 @@ name = "bibtex"
 version = "0.1.0"
 authors = ["Jack Weinbender <jack.weinbender@gmail.com>"]
 
+[lib]
+name = "bibtex"
+path = "src/lib.rs"
+
+[[bin]]
+name = "scratch"
+path = "src/bin.rs"
+
 [dependencies]
