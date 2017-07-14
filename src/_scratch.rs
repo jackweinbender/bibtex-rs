@@ -1,20 +1,32 @@
-#[macro_use]
-
-extern crate nom;
+#[macro_use] extern crate nom;
 
 use std::str;
+use nom::be_u8;
 
-named!(entry<&[u8], Vec<&[u8]> >, many0!( ws!(tag!( "@entry{}" )) ) );
+#[derive(Debug)]
+struct TT<'a> {
+    ty: &'a str,
+    ky: &'a str
+}
+
+named!(entry<&[u8], TT>,
+    do_parse!(
+        tag!("@")           >>
+        t: is_not_s!("{")   >>
+        k: is_not_s!("}")   >>
+        
+        ( TT{
+            ty: str::from_utf8(t).unwrap(), 
+            ky: str::from_utf8(k).unwrap()
+            } )
+    )
+);
 
 fn main() {
-    let input = b"@entry{} @entry{}";
+    let input = b"@entry{vermes,} @entry{vanderkam}";
     let output = entry(input);
 
-    let (res0, res1) = output.unwrap();
+    // debug!("output: {:?}", output);
 
-    let expected = "";
-
-    println!("{:?}, {:?}", str::from_utf8(res0), res1);
-
-    // assert!(output.unwrap(), expected);
+    println!("{:?}", output);
 }
