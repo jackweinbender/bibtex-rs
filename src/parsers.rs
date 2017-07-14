@@ -1,6 +1,11 @@
 use std::str;
-use nom::IResult::Done;
 use bibtex::Bibtex;
+use bibtex::AttrValue;
+
+
+fn to_slice(input: &[u8]) -> &str {
+    str::from_utf8(input).unwrap()
+}
 
 named!(entry_type, 
     do_parse!(
@@ -10,17 +15,6 @@ named!(entry_type,
         (entry_type)
     )
 );
-
-#[test]
-fn parse_entry_type() {
-    
-    let input = b"@article{";
-    let output = entry_type(input);
-
-    assert_eq!(output, Done(&b"{"[..], &b"article"[..]));
-}
-
-
 named!(entry_key, 
     do_parse!(
         ws!(tag!("{"))                      >>
@@ -31,18 +25,28 @@ named!(entry_key,
     )
 );
 
-#[test]
-fn parse_entry_key() {
 
-    assert_eq!( // Key-only entries
-        entry_key(b"{thekey}"), 
-        Done(&b"}"[..], &b"thekey"[..]));
-    assert_eq!( // Key with comma and \n
-        entry_key(b"{thekey,\n"), 
-        Done(&b"\n"[..], &b"thekey"[..]));
-
-}
-
+// named!(attr<&[u8], (&str, Vec<AttrValue>)>,
+//     do_parse!(
+//         key: is_not_s!(" \t\r\n,}=")      >>
+//         value: many1( alt!( num | string | alias ) )
+//     )
+// );
+named!(string<&[u8], Bibtex>,
+    do_parse!(
+        entry_type                  >>
+        k: entry_key                >>
+        ws!(tag!("="))              >>
+        v: delimited!(char!('{'), is_not!("}"), char!('}')) >>
+        tag!("}")                   >>
+        ( // Return Enum
+            Bibtex::String{
+                key: to_slice(k).trim(), 
+                value: to_slice(v).trim()
+            }
+        )
+    )
+);
 named!(entry<&[u8], Bibtex>,
     do_parse!(
         t: entry_type               >>
@@ -52,28 +56,70 @@ named!(entry<&[u8], Bibtex>,
         
         ( // Return Enum
             Bibtex::Entry {
-                t: str::from_utf8(t).unwrap(), 
-                key: str::from_utf8(k).unwrap(),
+                t:   to_slice(t), 
+                key: to_slice(k),
                 attrs: vec![]
             }
         )
     )
 );
 
-named!(string<&[u8], Bibtex>,
-    do_parse!(
-        entry_type                  >>
-        k: entry_key                >>
-        ws!(tag!("="))              >>
-        v: delimited!(char!('{'), is_not!("}"), char!('}')) >>
-        
-        ( // Return Enum
-            Bibtex::String{
-                key: str::from_utf8(k).unwrap(), 
-                value: str::from_utf8(v).unwrap()
-            }
-        )
-    )
-);
-
 named!(bib<&[u8], Vec<Bibtex> >, ws!(many0!( alt!(entry | string) )));
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use nom::IResult::Done;
+    #[test]
+    fn parse_entry_type() {
+        
+        let input = b"@article{";
+        let output = entry_type(input);
+
+        // Handles entry type, leaves brace
+        assert_eq!(output, Done(&b"{"[..], &b"article"[..]));
+    }
+
+    #[test]
+    fn parse_entry_key() {
+
+        let the_key = &b"thekey"[..];
+
+        // Handles key-only entries
+        assert_eq!( 
+            entry_key(b"{thekey}"), 
+            Done(&b"}"[..], the_key));
+        // Handles standard syntax (key with comma and \n)
+        assert_eq!( 
+            entry_key(b"{thekey,\n"), 
+            Done(&b"\n"[..], the_key));
+
+    }
+    #[test]
+    fn parse_string() {
+
+        let input = b"@string{ vanderkam = { James VanderKam }}";
+        let expected = Bibtex::String {
+            key: "vanderkam",
+            value: "James VanderKam"
+        };
+
+        // Parses Bibtex::String type
+        assert_eq!( 
+            string(input), 
+            Done(&b""[..], expected));
+    }
+
+    // #[test]
+    // fn parse_attr() {
+
+    //     let input_1 = b"Title = {{Bib}\\TeX}";
+    //     let input_2 = b"Title = \"{Bib}\\TeX\"";
+    //     let input_3 = b"Title = \"{Bib}\" # \"\\TeX\"";
+
+    //     let expected = "{Bib}\\TeX";
+
+    //     assert_eq!(attrs(input_1), Done(&b""[..], expected));
+
+    // }
+}
