@@ -1,25 +1,15 @@
-pub type BibtexBibliography = Vec<BibtexEntry>;
+// pub type BibtexBibliography = Vec<BibtexEntry>;
 
-pub struct BibtexEntry {
-    key: String,
-    bibtex_type: String,
-    attrs: Vec<EntryAttr>
+#[derive(Debug)]
+pub enum Bibtex<'a> {
+    Comment     {},
+    Preamble    {},
+    String      { key: &'a str, value: &'a str},
+    Entry       { key: &'a str, t: &'a str, attrs: Vec<(&'a str, Vec<BibtexValue>)>}
 }
-pub struct BibtexString {
-    key: String,
-    value: String
-}
-pub struct BibtexPreamble{
-    value: String
-}
-pub struct BibtexComment{
-    value: String
-}
-struct EntryAttr {
-    key: String,
-    value: BibtexValue
-}
-enum BibtexValue {
+
+#[derive(Debug)]
+pub enum BibtexValue {
     BibtexString,
     String
 }

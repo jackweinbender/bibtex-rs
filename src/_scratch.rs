@@ -1,32 +1,73 @@
 #[macro_use] extern crate nom;
 
+mod bibtex;
+
 use std::str;
-use nom::be_u8;
+use bibtex::Bibtex;
 
-#[derive(Debug)]
-struct TT<'a> {
-    ty: &'a str,
-    ky: &'a str
-}
-
-named!(entry<&[u8], TT>,
+named!(entry_type, 
     do_parse!(
-        tag!("@")           >>
-        t: is_not_s!("{")   >>
-        k: is_not_s!("}")   >>
-        
-        ( TT{
-            ty: str::from_utf8(t).unwrap(), 
-            ky: str::from_utf8(k).unwrap()
-            } )
+        tag!("@")                   >>
+        entry_type: is_not_s!("{")  >>
+        tag!("{")                   >>
+
+        (entry_type)
     )
 );
 
-fn main() {
-    let input = b"@entry{vermes,} @entry{vanderkam}";
-    let output = entry(input);
+#[test]
+fn entry_type() {
+    unimplemented!();
+}
 
-    // debug!("output: {:?}", output);
+named!(entry_key, 
+    do_parse!(
+        entry_key: is_not_s!(" \t\r\n,}=")   >>
+        ws!(opt!( tag!(",") ))              >>
+        
+        (entry_key)
+    )
+);
+
+named!(entry<&[u8], Bibtex>,
+    do_parse!(
+        t: entry_type               >>
+        k: entry_key                >>
+        ws!( tag!("}"))             >>
+        ws!( opt!( tag!(",") ) )    >>
+        
+        ( // Return Enum
+            Bibtex::Entry {
+                t: str::from_utf8(t).unwrap(), 
+                key: str::from_utf8(k).unwrap(),
+                attrs: vec![]
+            }
+        )
+    )
+);
+
+named!(string<&[u8], Bibtex>,
+    do_parse!(
+        entry_type                  >>
+        k: entry_key                >>
+        ws!(tag!("="))              >>
+        v: delimited!(char!('{'), is_not!("}"), char!('}')) >>
+        
+        ( // Return Enum
+            Bibtex::String{
+                key: str::from_utf8(k).unwrap(), 
+                value: str::from_utf8(v).unwrap()
+            }
+        )
+    )
+);
+
+named!(bib<&[u8], Vec<Bibtex> >, ws!(many0!( alt!(entry | string) )));
+
+fn main() {
+    let input = b"@entry{vermes,\n\t},\n\t@string{vanderkam = {James VanderKam},";
+    let output = bib(input);
+
 
     println!("{:?}", output);
 }
