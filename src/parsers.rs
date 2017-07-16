@@ -17,15 +17,27 @@ named!(entry_type,
 );
 named!(entry_key, 
     do_parse!(
-        ws!(tag!("{"))                      >>
-        entry_key: is_not_s!(" \t\r\n,}=")  >>
-        opt!( tag!(",") )                   >>
+        ws!(tag!("{"))                        >>
+        entry_key: is_not_s!(" \t\r\n,}=")    >>
+        ws!( opt!( complete!( tag!(",") ) ) ) >> 
         
         (entry_key)
     )
 );
 
+named!(num,
+    do_parse!(
+        num: ws!( is_a_s!("0123456789") )   >>
+        ws!( opt!( complete!( tag!(",") ) ) )    >>
 
+        (num)
+    )
+);
+named!(braced_string,
+    do_parse!(
+
+    )
+);
 // named!(attr<&[u8], (&str, Vec<AttrValue>)>,
 //     do_parse!(
 //         key: is_not_s!(" \t\r\n,}=")      >>
@@ -109,7 +121,28 @@ mod tests {
             string(input), 
             Done(&b""[..], expected));
     }
+    #[test]
+    fn parse_num() {
+        
+        let input_1 = b"1234,\n";
+        let input_2 = b"1234\n";
+        
+        assert_eq!(num(input_1), Done(&b""[..], &b"1234"[..]));
+        assert_eq!(num(input_2), Done(&b""[..], &b"1234"[..]));
 
+    }
+    #[test]
+    fn parse_braced_string() {
+        
+        let input_1 = b"{In the {{Beginning}}, {God} created},\n";
+        let input_2 = b"{In the {{Beginning}}, {God} created}\n";
+        
+        assert_eq!(braced_string(input_1), 
+            Done(&b""[..], &b"In the {{Beginning}}, {God} created"[..]));
+        assert_eq!(braced_string(input_2), 
+            Done(&b""[..], &b"In the {{Beginning}}, {God} created"[..]));
+
+    }
     // #[test]
     // fn parse_attr() {
 
