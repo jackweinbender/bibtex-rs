@@ -8,12 +8,12 @@ fn main() {
     let input = include_str!("bib.bib");
     let mut iter = input.chars();
 
-
+    let mut depth = 0;
 
     while let Some(ch) = iter.next() {
 
         match ch {
-            '@' => {
+            '@' if depth < 1 => {
                 let (entry, i) = entry(iter.clone());
                 print!("{:?}", entry);
             },
