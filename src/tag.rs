@@ -1,5 +1,5 @@
 #[derive(Debug, PartialEq)]
-struct Tag{key: String, content: String}
+pub struct Tag{key: String, content: String}
 
 impl Tag{
     pub fn new(s: &str) -> Tag {
